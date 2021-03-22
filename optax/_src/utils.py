@@ -15,6 +15,8 @@
 # ==============================================================================
 """Utility functions for testing."""
 
+from typing import Any
+
 import chex
 import jax
 import jax.numpy as jnp
@@ -41,6 +43,12 @@ def safe_norm(x, min_norm):
   norm = jnp.linalg.norm(x)
   x = jnp.where(norm < min_norm, jnp.ones_like(x), x)
   return jnp.where(norm < min_norm, min_norm, jnp.linalg.norm(x))
+
+
+def global_norm(updates: Any) -> Any:
+  """Global norm across a nested structure of parameters or updates."""
+  return jnp.sqrt(
+      sum([jnp.sum(jnp.square(x)) for x in jax.tree_leaves(updates)]))
 
 
 def safe_int32_increment(count):
